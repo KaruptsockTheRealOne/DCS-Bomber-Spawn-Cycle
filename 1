@@ -1,0 +1,49 @@
+	-- Spawn Air group on late activation (Late Activation must be turned on otherwise they aircraft will spawn on top of them selves.)
+	
+	--Group definment / Names / deviation along flight waypoints Section
+BASE:E({"Initalising bombers"})
+	-- bomber = Defined Groupname call
+bombers = nil
+bombers1 = nil
+
+-- bg 																	                                = ("spawnname")  
+-- SPAWN:NewWithAlias("B17G-1","B17Spawend") 							              = ("Name of Plane Group","Name of comment found in DCS Log - helps with troubleshooting")
+-- InitCleanUp(600) 													                          = ("If the unit is non responsive or the like for that period of seconds, delete it")
+-- InitRandomizeRoute(2,5,UTILS.NMToMeters(5),UTILS.FeetToMeters(2000)) = ("Startroute,Endroute",UTILS.NMToMeters("Random Distance within range of waypoint"),UTILS.FeetToMeters("Random Altitude within range of waypoint Altitude".))
+-- InitRepeatOnEngineShutDown()											                    = Repeat this spawn if landed and engines shut down
+-- OnSpawnGroup(function(spawngroup)									                  = Spawn call
+-- bombers = spawngroup 												                        = Defines groupname call = spawn that group in
+	
+	
+bg = SPAWN:NewWithAlias("B17G-1","B17Spawend"):InitCleanUp(600):InitRandomizeRoute(2,5,UTILS.NMToMeters(5),UTILS.FeetToMeters(2000)):InitRepeatOnEngineShutDown():OnSpawnGroup(function(spawngroup) 
+  bombers = spawngroup
+end)
+
+bg1 = SPAWN:NewWithAlias("JU88","JU88Spawend"):InitCleanUp(600):InitRandomizeRoute(2,5,UTILS.NMToMeters(5),UTILS.FeetToMeters(2000)):InitRepeatOnEngineShutDown():OnSpawnGroup(function(spawngroup) 
+  bombers1 = spawngroup
+end)
+
+	--Spawn Function Section
+BASE:E({"Initalising Scheduler"})
+SCHEDULER:New(nil,function() 
+
+	if bombers == nil then
+    BASE:E({"Bombers was nil spawning"})
+    bg:Spawn()
+  else
+    if bombers:IsAlive() ~= true or bombers:AllOnGround() == true then
+      BASE:E({"Bombers was not nil or all on group",bombers:IsAlive(),bombers:AllOnGround()})
+      bg:Spawn()
+    end
+  end
+
+  if bombers1 == nil then
+    BASE:E({"Bombers1 was nil spawning"})
+    bg1:Spawn()
+  else
+    if bombers1:IsAlive() ~= true or bombers1:AllOnGround() == true then
+      BASE:E({"Bombers1 was not nil or all on group",bombers1:IsAlive(),bombers1:AllOnGround()})
+      bg1:Spawn()
+    end
+  end
+ end,{},1,1600,1.0)
